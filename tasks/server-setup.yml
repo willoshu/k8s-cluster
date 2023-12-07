@@ -1,0 +1,26 @@
+---
+- name: Server-setup | open necessary
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    state: enabled
+  loop:
+    - kubelet
+    - kube-nodeport-services
+- name: Server-setup | disable swap
+  ansible.builtin.command:
+    cmd: swapoff -a
+  register: swapoff_out
+  changed_when: swapoff_out.rc == 0
+- name: Server-setup | Comment out the swap line in fstab
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    regexp: '^(.+swap.+)'
+    backrefs: true
+    line: '#\1'
+- name: Server-setup | remount all to make sure fstab is correct
+  ansible.builtin.command:
+    cmd: mount -a
+  register: mount_out
+  changed_when: mount_out.rc == 0
+- name: Server-setup | reboot the server
+  ansible.builtin.reboot:

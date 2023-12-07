@@ -1,0 +1,32 @@
+---
+- name: Install-runtime | prereqs
+  ansible.builtin.script: files/prereqs-install-container-runtime.sh
+- name: Install-runtime | remove previous runtime
+  ansible.builtin.yum:
+    name:
+      - docker-client
+      - docker-client-latest
+      - docker-common
+      - docker-latest
+      - docker-latest-logrotate
+      - docker-logrotate
+      - docker-engine
+    state: absent
+- name: Install-runtime | setup docker repo
+  ansible.builtin.yum_repository:
+    name: docker-ce
+    description: docker-ce repo
+    baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+- name: Install-runtime | install docker
+  ansible.builtin.yum:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+- name: Install-runtime | start docker
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
