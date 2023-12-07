@@ -19,7 +19,7 @@
     line: '#\1'
 - name: Server-setup | remount all to make sure fstab is correct
   ansible.builtin.command:
-    cmd: mount -a
+    cmd: mount -a # noqa: command-instead-of-module
   register: mount_out
   changed_when: mount_out.rc == 0
 - name: Server-setup | reboot the server
