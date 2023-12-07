@@ -30,3 +30,38 @@
     name: docker
     state: started
     enabled: true
+- name: Install-runtime | install cri-dockerd | download pre-compiled cri-dockerd files
+  ansible.builtin.get_url:
+    url: https://github.com/Mirantis/cri-dockerd/releases/download/v0.3.8/cri-dockerd-0.3.8.amd64.tgz
+    dest: /tmp/cri-dockerd.tgz
+    mode: "0755"
+- name: Install-runtime | install cri-dockerd | unarchive cri-dockerd.tgz
+  ansible.builtin.unarchive:
+    src: /tmp/cri-dockerd.tgz
+    dest: /tmp
+- name: Install-runtime | install cri-dockerd | ensure presence of /usr/local/bin diretory
+  ansible.builtin.file:
+    path: /usr/local/bin
+    state: directory
+    mode: "0755"
+- name: Install-runtime | install cri-dockerd | install cri-dockerd binaries
+  ansible.builtin.command:
+    cmd: install -o root -g root -m 0755 cri-dockerd /usr/local/bin/cri-dockerd # noqa: no-changed-when
+    chdir: /tmp/cri-dockerd
+- name: Install-runtime | install cri-dockerd | install cri-dockerd packaging
+  ansible.builtin.command:
+    cmd: install packaging/systemd/* /etc/systemd/system # noqa: no-changed-when
+    chdir: /tmp/cri-dockerd
+- name: Install-runtime | install cri-dockerd | configure cri-docker.service
+  ansible.builtin.replace:
+    path: /etc/systemd/system/cri-docker.service
+    regexp: /usr/bin/cri-dockerd
+    replace: /usr/local/bin/cri-dockerd
+- name: Install-runtime | install cri-dockerd | reload daemon
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+- name: Install-runtime | install cri-dockerd | start cri-docker socker
+  ansible.builtin.service:
+    name: cri-docker.socket
+    state: started
+    enabled: true
