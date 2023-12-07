@@ -1,0 +1,17 @@
+---
+- name: Install-tools | Set SELinux in permissive mode now
+  ansible.builtin.command:
+    cmd: setenforce permissive # noqa: no-changed-when
+- name: Install-tools | Set SELinux in permissive mode persistently
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
+- name: Install-tools | remove current kubernetes.repo file
+  ansible.builtin.file:
+    path: /etc/yum.repos.d/kubernetes.repo
+    state: absent
+- name: Install-tools | import new kubernetes.repo file
+  ansible.builtin.copy:
+    src: files/kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+    mode: "0644"
