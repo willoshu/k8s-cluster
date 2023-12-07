@@ -1,12 +1,13 @@
-Role Name
+K8s-cluster-deploy
 =========
 
-A brief description of the role goes here.
+This role deploy a kubernetes cluster
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+This role requires the installation of installation of ansible.posix collection in addition to ansible-core
+ansible-galaxy collection install ansible.posix
 
 Role Variables
 --------------
@@ -16,7 +17,7 @@ A description of the settable variables for this role should go here, including 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None so far
 
 Example Playbook
 ----------------
