@@ -6,6 +6,19 @@
   loop:
     - kubelet
     - kube-nodeport-services
+  tags: worker
+- name: Server-setup | open necessary
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    state: enabled
+  loop:
+    - kube-apiserver
+    - etcd-client
+    - etc-server
+    - kubelet
+    - kube-scheduler-secure
+    - kube-controller-manager-secure
+  tags: control-plane
 - name: Server-setup | disable swap
   ansible.builtin.command:
     cmd: swapoff -a
