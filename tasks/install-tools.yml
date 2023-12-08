@@ -15,3 +15,16 @@
     src: files/kubernetes.repo
     dest: /etc/yum.repos.d/kubernetes.repo
     mode: "0644"
+- name: Install-tools | install packages
+  ansible.builtin.yum:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    state: present
+    disable_excludes: kubernetes
+- name: Install-tools | start services
+  ansible.builtin.service:
+    name: kubelet
+    state: started
+    enabled: true
