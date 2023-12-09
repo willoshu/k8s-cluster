@@ -1,10 +1,10 @@
 ---
 # tasks file for k8s-cluster
 - name: Server-setup
-  ansible.builtin.include_tasks: server-setup.yml
+  ansible.builtin.import_tasks: server-setup.yml
 - name: Install-runtime
-  ansible.builtin.include_tasks: install-runtime.yml
+  ansible.builtin.import_tasks: install-runtime.yml
 - name: Install-tools
-  ansible.builtin.include_tasks: install-tools.yml
+  ansible.builtin.import_tasks: install-tools.yml
 - name: Deploy-cluster
-  ansible.builtin.include_tasks: deploy-cluster.yml
+  ansible.builtin.import_tasks: deploy-cluster.yml
