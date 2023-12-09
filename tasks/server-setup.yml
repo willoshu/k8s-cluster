@@ -6,7 +6,7 @@
   loop:
     - kubelet
     - kube-nodeport-services
-  tags: worker
+  when: "'workers' in group_names"
 - name: Server-setup | open necessary
   ansible.posix.firewalld:
     service: "{{ item }}"
@@ -18,7 +18,7 @@
     - kubelet
     - kube-scheduler-secure
     - kube-controller-manager-secure
-  tags: control-plane
+  when: "'control-plane' in group_names"
 - name: Server-setup | disable swap
   ansible.builtin.command:
     cmd: swapoff -a
