@@ -17,6 +17,7 @@
     line: '#!/bin/bash'
     insertbefore: "BOF"
   delegate_to: localhost
+  tags: control-plane
 - name: Deploy-cluster | fetch joincommand file into worker nodes
   ansible.builtin.copy:
     src: /tmp/joincommand.sh
