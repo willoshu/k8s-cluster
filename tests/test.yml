@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Play to deploy a kubernetes control-plane
+  hosts: localhost
   remote_user: root
   roles:
-    - k8s-cluster
+    - ../k8s-cluster
