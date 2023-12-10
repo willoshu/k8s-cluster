@@ -1,4 +1,4 @@
-K8s-cluster
+K8s_cluster
 =========
 
 This role deploy a kubernetes cluster
