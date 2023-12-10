@@ -1,4 +1,4 @@
-K8s-cluster-deploy
+K8s-cluster
 =========
 
 This role deploy a kubernetes cluster
@@ -24,14 +24,16 @@ Example Playbook
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
+    - hosts: control:workers
       roles:
-         - { role: username.rolename, x: 42 }
+         - k8s_cluster
+
+Note: Inventory file must contain the following groups: 'control' and 'workers'
 
 License
 -------
 
-BSD
+0BSD
 
 Author Information
 ------------------

@@ -1,5 +1,5 @@
 ---
-- name: Server-setup | open necessary
+- name: Server-setup | open necessary ports for workers
   ansible.posix.firewalld:
     service: "{{ item }}"
     state: enabled
@@ -7,7 +7,7 @@
     - kubelet
     - kube-nodeport-services
   when: "'workers' in group_names"
-- name: Server-setup | open necessary
+- name: Server-setup | open necessary ports for control
   ansible.posix.firewalld:
     service: "{{ item }}"
     state: enabled
