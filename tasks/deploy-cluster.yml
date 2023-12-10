@@ -3,26 +3,28 @@
   ansible.builtin.command:
     cmd: kubeadm init --pod-network-cidr=172.10.0.0/16 --cri-socket=unix:///var/run/cri-dockerd.soc # noqa: no-changed-when
   register: kubeadm_init_out
-  when: "'control-plane' in group_names"
+  when: "'control' in group_names"
 - name: Deploy-cluster | extract join command to file
   ansible.builtin.copy:
     content: "{{ kubeadm_init_out.stdout_lines[-1] | regex_replace('\\s{2}', '') }}"
     dest: /tmp/joincommand.sh
     mode: "0755"
   delegate_to: localhost
-  when: "'control-plane' in group_names"
+  when: "'control' in group_names"
 - name: Deploy-cluster | add shebang to /tmp/joincommand.sh
   ansible.builtin.lineinfile:
     path: /tmp/joincommand.sh
     line: '#!/bin/bash'
     insertbefore: "BOF"
   delegate_to: localhost
-  when: "'control-plane' in group_names"
+  when: "'control' in group_names"
 - name: Deploy-cluster | fetch joincommand file into worker nodes
   ansible.builtin.copy:
     src: /tmp/joincommand.sh
     dest: /tmp/joincommand.sh
     mode: "0755"
+  retries: 5
+  delay: 30
   when: "'workers' in group_names"
 - name: Deploy-cluster | run joincommand
   ansible.builtin.script: /tmp/joincommand.sh
