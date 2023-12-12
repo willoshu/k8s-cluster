@@ -2,11 +2,11 @@
 - name: Deploy-cluster | Initializing your control-plane node
   ansible.builtin.command:
     cmd: kubeadm init --pod-network-cidr=172.10.0.0/16 --cri-socket=unix:///var/run/cri-dockerd.soc # noqa: no-changed-when
-  register: kubeadm_init_out
+  register: kubeadm_init
   when: "'control' in group_names"
 - name: Deploy-cluster | extract join command to file
   ansible.builtin.copy:
-    content: "{{ kubeadm_init_out.stdout_lines[-1] | regex_replace('\\s{2}', '') }}"
+    content: "{{ kubeadm_init.stdout_lines[-1] | regex_replace('\\s{2}', '') }}"
     dest: /tmp/joincommand.sh
     mode: "0755"
   delegate_to: localhost
@@ -26,6 +26,17 @@
   retries: 5
   delay: 30
   when: "'workers' in group_names"
+- name: Deploy-cluster | download manifest for calico Pod network add-on
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.4/manifests/calico.yaml
+    dest: /tmp/calico.yaml
+    mode: '0644'
+  when: "'control' in group_names"
+- name: Deploy-cluster | install calico pod network add-on
+  ansible.builtin.command:
+    cmd: kubectl apply -f /tmp/calico.yaml # noqa: no-changed-when
+  environment: "{{ proxy_env }}"
+  when: "'control' in group_names"
 - name: Deploy-cluster | run joincommand
   ansible.builtin.script: /tmp/joincommand.sh
   when: "'workers' in group_names"
