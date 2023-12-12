@@ -1,2 +1,4 @@
 ---
-# vars file for k8s-cluster
+# vars file for k8s_cluster
+proxy_env:
+  KUBECONFIG: /etc/kubernetes/admin.conf
