@@ -1,29 +1,28 @@
 ---
+- name: Server-setup | open necessary ports for control
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    state: enabled
+    permanent: true
+  loop:
+    - 6443/tcp
+    - 2379-2380/tcp
+    - 10250/tcp
+    - 10259/tcp
+    - 10257/tcp
+  when: "'control' in group_names"
 - name: Server-setup | open necessary ports for workers
   ansible.posix.firewalld:
     service: "{{ item }}"
     state: enabled
+    permanent: true
   loop:
-    - kubelet
-    - kube-nodeport-services
+    - 10250/tcp
+    - 30000-32767/tcp
   when: "'workers' in group_names"
-- name: Server-setup | open necessary ports for control
-  ansible.posix.firewalld:
-    service: "{{ item }}"
-    state: enabled
-  loop:
-    - kube-apiserver
-    - etcd-client
-    - etc-server
-    - kubelet
-    - kube-scheduler-secure
-    - kube-controller-manager-secure
-  when: "'control' in group_names"
 - name: Server-setup | disable swap
   ansible.builtin.command:
-    cmd: swapoff -a
-  register: swapoff_out
-  changed_when: swapoff_out.rc == 0
+    cmd: swapoff -a # noqa: no-changed-when
 - name: Server-setup | Comment out the swap line in fstab
   ansible.builtin.lineinfile:
     path: /etc/fstab
@@ -32,8 +31,13 @@
     line: '#\1'
 - name: Server-setup | remount all to make sure fstab is correct
   ansible.builtin.command:
-    cmd: mount -a # noqa: command-instead-of-module
-  register: mount_out
-  changed_when: mount_out.rc == 0
+    cmd: mount -a # noqa: command-instead-of-module no-changed-when
 - name: Server-setup | reboot the server
   ansible.builtin.reboot:
+- name: Server-setup | verify that swap is disabled
+  ansible.builtin.command:
+    cmd: free -h; lsblk; blkid # noqa: no-changed-when
+  register: swap_info
+- name: Server-setup | display swap verification output
+  ansible.builtin.debug:
+    msg: "{{ swap_info.stdout_lines }}"
